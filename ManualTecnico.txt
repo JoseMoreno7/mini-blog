@@ -1,0 +1,206 @@
+📝 Manual Técnico del Proyecto Mini Blog
+📖 Descripción General
+
+El Mini Blog es una aplicación web desarrollada en PHP puro con PDO y MySQL, diseñada para gestionar artículos con funcionalidades completas de CRUD (Crear, Leer, Actualizar, Eliminar).
+Se ha implementado un diseño moderno con Tailwind CSS y una experiencia de usuario interactiva mediante SweetAlert2 para mostrar mensajes y confirmaciones elegantes sin depender del navegador.
+
+🧩 Tecnologías Utilizadas
+Tecnología / Herramienta	Uso principal
+PHP 8+	Lenguaje backend principal.
+PDO (PHP Data Objects)	Conexión segura a base de datos con prepared statements.
+MySQL / MariaDB	Motor de base de datos.
+HTML5 / Tailwind CSS	Estructura y diseño visual moderno.
+JavaScript (SweetAlert2)	Ventanas modales para mensajes, confirmaciones y alertas.
+Laragon / XAMPP / WAMP	Entorno local de desarrollo PHP.
+🧱 Estructura del Proyecto
+mini-blog/
+│
+├── config/
+│   └── conexion.php              # Configuración y conexión PDO a MySQL
+│
+├── includes/
+│   ├── header.php                # Encabezado HTML + Navbar
+│   ├── footer.php                # Pie de página
+│   └── mensajes.php              # Mensajes globales con SweetAlert2
+│
+├── public/
+│   ├── index.php                 # Página principal - Listado de artículos
+│   ├── crear.php                 # Crear nuevo artículo
+│   ├── editar.php                # Editar artículo existente
+│   ├── eliminar.php              # Eliminar artículo (POST)
+│
+├── assets/
+│   ├── css/
+│   │   └── tailwind.min.css      # Archivo CSS de Tailwind
+│   └── js/
+│       └── sweetalert2.all.min.js # Librería SweetAlert2
+│
+└── database/
+    └── script.sql                # Script SQL de creación de tabla
+
+🗃️ Estructura de la Base de Datos
+
+Base de datos: mini_blog
+
+Tabla: articulos
+
+CREATE TABLE articulos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  titulo VARCHAR(255) NOT NULL,
+  contenido TEXT NOT NULL,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+⚙️ Archivo de Conexión
+
+config/conexion.php
+
+<?php
+$host = 'localhost';
+$db   = 'mini_blog';
+$user = 'root';
+$pass = '';
+$charset = 'utf8mb4';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=$charset", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Error de conexión: " . $e->getMessage());
+}
+
+🧮 Flujo del CRUD
+🟩 1. Crear (crear.php)
+
+Formulario con campos título y contenido.
+
+Validación con PHP y SweetAlert.
+
+Al guardar, redirige a index.php?mensaje=Artículo creado correctamente.
+
+🟦 2. Leer (index.php)
+
+Consulta todos los artículos:
+SELECT * FROM articulos ORDER BY fecha_creacion DESC;
+
+Muestra tarjetas con título, resumen del contenido y fecha.
+
+Botones de Editar y Eliminar con estilos y confirmaciones.
+
+🟨 3. Editar (editar.php)
+
+Muestra los datos del artículo cargado por ID.
+
+Al presionar “Actualizar”, pregunta si deseas guardar los cambios con SweetAlert.
+
+Si se confirma, ejecuta:
+
+UPDATE articulos SET titulo = ?, contenido = ? WHERE id = ?
+
+🟥 4. Eliminar (eliminar.php)
+
+Solo acepta peticiones POST.
+
+Confirma con SweetAlert antes de eliminar.
+
+Si se confirma, envía un formulario oculto con el id:
+
+DELETE FROM articulos WHERE id = ?
+
+🧠 Lógica de Confirmaciones Inteligentes
+
+Eliminar:
+Mensaje: “¿Estás seguro? Esta acción eliminará el artículo permanentemente.”
+
+Editar:
+Antes de actualizar: “¿Guardar cambios?”
+
+Cancelar (crear o editar):
+Detecta si hay texto escrito y pregunta:
+“¿Salir sin guardar? Los cambios no se guardarán si sales ahora.”
+
+Todo esto implementado con SweetAlert2 y JavaScript nativo.
+
+🧰 Mensajes Globales (includes/mensajes.php)
+
+Se centralizó el manejo de mensajes de éxito/error mediante parámetros en la URL:
+
+// Ejemplo de redirección tras acción exitosa
+header('Location: index.php?mensaje=Artículo eliminado correctamente');
+
+
+Y su visualización con SweetAlert2:
+
+if (isset($_GET['mensaje'])) {
+    Swal.fire({
+        icon: 'success',
+        title: '✅ Éxito',
+        text: '<?= htmlspecialchars($_GET['mensaje']) ?>',
+        showConfirmButton: false,
+        timer: 2500
+    });
+}
+
+🎨 Diseño y UX
+
+El sistema usa Tailwind CSS para un diseño limpio, moderno y adaptable:
+
+Tarjetas con sombras y efectos hover.
+
+Botones con colores intuitivos:
+
+Azul → Crear / Guardar
+
+Amarillo → Editar
+
+Rojo → Eliminar
+
+Gris → Cancelar
+
+Formularios con focus:ring y validaciones visuales.
+
+🔒 Buenas Prácticas Implementadas
+
+✅ Uso de PDO + prepared statements → Prevención de SQL Injection.
+✅ Validaciones del lado del servidor y cliente.
+✅ Uso de método POST en eliminaciones (seguridad).
+✅ Separación clara de responsabilidades (includes/, config/, public/).
+✅ Manejo de errores con redirecciones controladas.
+✅ Escapado de datos con htmlspecialchars() en las vistas.
+✅ SweetAlert2 para UX y prevención de acciones accidentales.
+
+🚀 Ejecución del Proyecto
+
+Iniciar Laragon o XAMPP.
+
+Crear la base de datos mini_blog.
+
+Importar database/script.sql.
+
+Colocar el proyecto en la carpeta www o htdocs.
+
+Acceder desde el navegador:
+👉 http://localhost/mini-blog/public/
+
+🔧 Posibles Extensiones Futuras
+
+Agregar sistema de usuarios y login.
+
+Soporte para imágenes por artículo.
+
+Filtro o búsqueda de artículos.
+
+Paginación.
+
+API REST para consumir artículos desde frontend moderno.
+
+🧾 Resumen Técnico
+Categoría	Detalle
+Lenguaje	PHP 8+
+Base de Datos	MySQL
+Conexión	PDO
+Estilos	Tailwind CSS
+Alertas	SweetAlert2
+CRUD	Completo (con confirmaciones y validaciones)
+Seguridad	Validación + Escapado + Método POST seguro
+UX	Moderna, responsiva e intuitiva

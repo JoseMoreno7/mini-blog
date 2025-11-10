@@ -1,0 +1,10 @@
+{
+  "name": "jose/mini-blog",
+  "description": "Mini Blog PHP",
+  "require": {
+    "php": "^8.0"
+  },
+  "scripts": {
+    "start": "php -S 0.0.0.0:${PORT:-8000} -t public"
+  }
+}

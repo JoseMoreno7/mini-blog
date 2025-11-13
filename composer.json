@@ -2,9 +2,5 @@
   "name": "jose/mini-blog",
   "description": "Mini Blog PHP",
   "require": {
-    "php": "^8.2"
-  },
-  "scripts": {
-    "start": "php -S 0.0.0.0:8080 -t public"
-  }
+    "php": "^8.2"}
 }

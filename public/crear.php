@@ -4,10 +4,13 @@ require_once '../config/conexion.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $titulo = trim($_POST['titulo']);
     $contenido = trim($_POST['contenido']);
+    // Nuevo: definimos el autor, puede venir del formulario o tener valor por defecto
+    $autor = trim($_POST['autor'] ?? 'Admin');
 
     if ($titulo && $contenido) {
-        $stmt = $pdo->prepare("INSERT INTO articulos (titulo, contenido) VALUES (?, ?)");
-        $stmt->execute([$titulo, $contenido]);
+        // Ahora incluimos el campo autor en la consulta
+        $stmt = $pdo->prepare("INSERT INTO articulos (titulo, contenido, autor) VALUES (?, ?, ?)");
+        $stmt->execute([$titulo, $contenido, $autor]);
         header('Location: index.php?mensaje=Artículo creado correctamente');
         exit;
     } else {
@@ -39,6 +42,9 @@ include '../includes/header.php';
                   placeholder="Escribe el contenido de tu artículo..."></textarea>
     </div>
 
+    <!-- Nuevo: campo oculto para el autor -->
+    <input type="hidden" name="autor" value="Admin">
+
     <div class="flex justify-end">
         <button type="button" onclick="confirmarSalida()" 
                 class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition mr-2">
@@ -52,9 +58,8 @@ include '../includes/header.php';
 
 <script>
 function confirmarSalida() {
-    // Verificar si hay contenido en el formulario
-    const titulo = document.querySelector('input[name="titulo"]').value;
-    const contenido = document.querySelector('textarea[name="contenido"]').value;
+const titulo = document.querySelector('input[name="titulo"]').value;
+const contenido = document.querySelector('textarea[name="contenido"]').value;
     
     if (titulo.trim() || contenido.trim()) {
         Swal.fire({
@@ -72,8 +77,7 @@ function confirmarSalida() {
             }
         });
     } else {
-        // Si está vacío, salir directamente
-        window.location.href = 'index.php';
+     window.location.href = 'index.php';
     }
 }
 </script>
